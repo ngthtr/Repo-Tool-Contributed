@@ -22,6 +22,7 @@ from typing import List, Optional, TYPE_CHECKING
 import error
 import event_log
 import progress
+import worksets
 
 
 if TYPE_CHECKING:
@@ -363,6 +364,11 @@ class Command:
         finally:
             if isinstance(output, progress.Progress):
                 output.end()
+
+    def GetWorksets(self) -> worksets.Worksets:
+        """The worksets of this client checkout."""
+        manifest = self.outer_manifest or self.manifest
+        return worksets.Worksets(manifest.manifestProject.config.file)
 
     def _ResetPathToProjectMap(self, projects):
         self._by_path = {p.worktree: p for p in projects}

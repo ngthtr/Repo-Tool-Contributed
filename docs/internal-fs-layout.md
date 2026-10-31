@@ -187,6 +187,12 @@ User controlled settings are initialized when running `repo init`.
 | user.email               | `--config-name`           | User's e-mail address; Copied into `.git/config` when checking out a new project |
 | user.name                | `--config-name`           | User's name; Copied into `.git/config` when checking out a new project |
 
+Worksets are managed with `repo workset` rather than `repo init`:
+
+| Setting                  | Use/Meaning |
+|--------------------------|-------------|
+| workset.\<name\>.project | A project of the workset, as `<path>:<branch>`: its path relative to the outermost manifest, and the local branch used for it, empty if none; one entry per project |
+
 [partial git clones]: https://git-scm.com/docs/partial-clone
 [superproject]: https://en.wikibooks.org/wiki/Git/Submodules_and_Superprojects
 
