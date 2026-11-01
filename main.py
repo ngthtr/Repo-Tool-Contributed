@@ -177,6 +177,8 @@ global_options.add_option(
     metavar="REL_PATH",
     help="submanifest path",
 )
+# Stop at the subcommand name: what follows are its own options and args.
+global_options.disable_interspersed_args()
 
 
 class _Repo:
@@ -204,17 +206,11 @@ class _Repo:
 
     def _ParseArgs(self, argv):
         """Parse the main `repo` command line options."""
-        for i, arg in enumerate(argv):
-            if not arg.startswith("-"):
-                name = arg
-                glob = argv[:i]
-                argv = argv[i + 1 :]
-                break
-        else:
-            name = None
-            glob = argv
-            argv = []
-        gopts, _gargs = global_options.parse_args(glob)
+        # Let optparse find the subcommand name, so global options can take
+        # their value as a separate argument, e.g. `repo --color never status`.
+        gopts, gargs = global_options.parse_args(argv)
+        name = gargs[0] if gargs else None
+        argv = gargs[1:]
 
         if name:
             name, alias_args = self._ExpandAlias(name)
