@@ -1,5 +1,50 @@
 # repo
 
+## Workset feature (this branch)
+
+This branch adds **worksets** to repo: named sets of projects that you change
+together for one task, each on its own local branch (e.g. a HAL, its kernel
+driver and the device config). A workset is local to your client checkout: it
+does not change the manifest nor what `repo sync` fetches.
+
+### Manage worksets: `repo workset`
+
+```sh
+repo workset [-v]                                  # list worksets (-v: projects and branches)
+repo workset create <workset> <project>[:<branch>]...
+repo workset add    <workset> <project>[:<branch>]...
+repo workset update <workset> <project>[:<branch>]...  # change recorded branches
+repo workset remove <workset> <project>...
+repo workset delete <workset>...
+```
+
+- `<project>:<branch>` records the branch to use for the project.
+  With `<project>` alone, the branch currently checked out is recorded.
+- Worksets are stored in `.repo/manifests.git/config`, so they survive
+  `repo sync`, and may span submanifests.
+
+### Use a workset with other commands: `-W/--workset`
+
+```sh
+repo -W light status
+repo -W light start my-topic
+repo --workset light forall -c git log -1 --oneline
+repo -W task-a checkout     # check out the recorded branch in every project
+```
+
+- With no project argument, the command runs on the projects of the workset.
+  Projects given on the command line must belong to the workset.
+- Supported commands: abandon, branches, checkout, diff, forall, grep, info,
+  list, overview, prune, rebase, stage, start, status, upload.
+  Other commands (including `sync`) reject `-W`.
+- `repo -W <workset> checkout` with no branch switches every project to the
+  branch recorded for it, to switch between tasks.
+
+The branch also fixes global options taking their value as a separate
+argument, e.g. `repo --color never status`.
+
+---
+
 Repo is a tool built on top of Git.  Repo helps manage many Git repositories,
 does the uploads to revision control systems, and automates parts of the
 development workflow.  Repo is not meant to replace Git, only to make it
