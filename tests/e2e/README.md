@@ -34,4 +34,5 @@ superproject support), or when not run from a git checkout.
 * `test_groups.py`: manifest groups.
 * `test_failures.py`: failure paths (missing projects, dirty trees, ...).
 * `test_workflows.py`: multi-step workflows.
+* `test_workset_workflows.py`: worksets, with `repo workset` & `-W`.
 * `test_manifest_regressions.py`: manifests that broke users in the past.

@@ -63,6 +63,7 @@ class BranchInfo:
 
 class Branches(command.Command):
     COMMON = True
+    WORKSET_SUPPORT = True
     helpSummary = "View current topic branches"
     helpUsage = """
 %prog [<project>...]

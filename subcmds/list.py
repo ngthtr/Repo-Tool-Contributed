@@ -19,6 +19,7 @@ import command
 
 class List(command.Command, command.MirrorSafeCommand):
     COMMON = True
+    WORKSET_SUPPORT = True
     helpSummary = "List projects and their associated directories"
     helpUsage = """
 %prog [-f] [<project>...]

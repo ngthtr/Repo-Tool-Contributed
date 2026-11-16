@@ -20,6 +20,7 @@ import command
 
 class Diff(command.PagedCommand):
     COMMON = True
+    WORKSET_SUPPORT = True
     helpSummary = "Show changes between commit and working tree"
     helpUsage = """
 %prog [<project>...]

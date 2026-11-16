@@ -52,6 +52,7 @@ class _Coloring(color.Coloring):
 
 class Info(command.PagedCommand):
     COMMON = True
+    WORKSET_SUPPORT = True
     PARALLEL_JOBS = command.DEFAULT_LOCAL_JOBS
     helpSummary = (
         "Get info on the manifest branch, current branch or unmerged branches"

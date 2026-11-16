@@ -171,6 +171,10 @@ class InvalidProjectGroupsError(RepoExitError):
         return self.name
 
 
+class WorksetError(RepoExitError):
+    """A workset does not exist, or does not fit the command."""
+
+
 class RepoChangedException(BaseRepoError):
     """Thrown if 'repo sync' results in repo updating its internal
     repo or manifest repositories.  In this special case we must

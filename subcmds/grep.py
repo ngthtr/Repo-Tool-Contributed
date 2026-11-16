@@ -51,6 +51,7 @@ class GrepCommandError(error.SilentRepoExitError):
 
 class Grep(command.PagedCommand):
     COMMON = True
+    WORKSET_SUPPORT = True
     helpSummary = "Print lines matching a pattern"
     helpUsage = """
 %prog {pattern | -e pattern} [<project>...]

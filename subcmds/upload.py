@@ -105,6 +105,7 @@ def _SplitEmails(values):
 
 class Upload(command.InteractiveCommand):
     COMMON = True
+    WORKSET_SUPPORT = True
     helpSummary = "Upload changes for code review"
     helpUsage = """
 %prog [--re --cc] [<project>]...

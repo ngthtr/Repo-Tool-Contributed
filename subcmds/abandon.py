@@ -32,6 +32,7 @@ class AbandonError(error.RepoExitError):
 
 class Abandon(command.Command):
     COMMON = True
+    WORKSET_SUPPORT = True
     helpSummary = "Permanently abandon a development branch"
     helpUsage = """
 %prog [--all | <branchname>] [<project>...]

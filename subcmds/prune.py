@@ -20,6 +20,7 @@ import command
 
 class Prune(command.PagedCommand):
     COMMON = True
+    WORKSET_SUPPORT = True
     helpSummary = "Prune (delete) already merged topics"
     helpUsage = """
 %prog [<project>...]

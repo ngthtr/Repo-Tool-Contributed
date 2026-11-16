@@ -37,6 +37,7 @@ class StartError(error.RepoExitError):
 
 class Start(command.Command):
     COMMON = True
+    WORKSET_SUPPORT = True
     helpSummary = "Start a new branch for development"
     helpUsage = """
 %prog <newbranchname> [--all | <project>...]
@@ -108,7 +109,7 @@ revision specified in the manifest.
         projects = []
         if not opt.all:
             projects = args[1:]
-            if len(projects) < 1:
+            if len(projects) < 1 and not self.workset:
                 projects = ["."]  # start it in the local project by default
 
         all_projects = self.GetProjects(

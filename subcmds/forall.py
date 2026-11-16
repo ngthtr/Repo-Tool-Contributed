@@ -43,6 +43,7 @@ class ForallColoring(color.Coloring):
 
 class Forall(command.Command, command.MirrorSafeCommand):
     COMMON = False
+    WORKSET_SUPPORT = True
     helpSummary = "Run a shell command in each project"
     helpUsage = """
 %prog [<project>...] -c <command> [<arg>...]

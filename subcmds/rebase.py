@@ -45,6 +45,7 @@ def _ResolveOntoManifest(project: Project) -> str:
 
 class Rebase(command.Command):
     COMMON = True
+    WORKSET_SUPPORT = True
     helpSummary = "Rebase local branches on upstream branch"
     helpUsage = """
 %prog {[<project>...] | -i <project>...}

@@ -72,6 +72,11 @@ HEAD or not checked out yet. Use <project>: to record no branch.
 Worksets are stored in .repo/manifests.git/config and use project paths
 relative to the outermost manifest.
 
+Use the global option -W <workset> (or --workset) to limit other commands to
+the projects of a workset, e.g. `repo -W light status`. `repo -W <workset>
+checkout` checks out the recorded branch of every project, to switch to the
+task.
+
 With no subcommand, list the worksets. With -v, also list their projects
 and branches, and the branch checked out when it differs.
 

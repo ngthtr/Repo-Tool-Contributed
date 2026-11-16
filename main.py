@@ -56,6 +56,7 @@ import pager
 import repo_trace
 import subcmds
 from subcmds.version import Version
+import worksets
 import wrapper
 
 
@@ -176,6 +177,13 @@ global_options.add_option(
     action="store",
     metavar="REL_PATH",
     help="submanifest path",
+)
+global_options.add_option(
+    "-W",
+    "--workset",
+    dest="workset",
+    metavar="WORKSET",
+    help="operate on the projects of this workset (see `repo help workset`)",
 )
 # Stop at the subcommand name: what follows are its own options and args.
 global_options.disable_interspersed_args()
@@ -419,6 +427,16 @@ class _Repo:
             logger.error("fatal: '%s' requires a working directory", name)
             return 1
 
+        if gopts.workset:
+            if not cmd.WORKSET_SUPPORT:
+                logger.error("fatal: '%s' does not support -W", name)
+                return 1
+            cmd.workset = gopts.workset
+            cmd.workset_members = cmd.GetWorksets().Get(gopts.workset)
+            if cmd.workset_members is None:
+                logger.error("fatal: no such workset '%s'", gopts.workset)
+                return 1
+
         try:
             copts, cargs = cmd.OptionParser.parse_args(argv)
             copts = cmd.ReadEnvironmentOptions(copts)
@@ -431,6 +449,12 @@ class _Repo:
 
         cmd.CommonValidateOptions(copts, cargs)
         git_trace2_event_log.verbose = copts.verbose
+
+        if cmd.workset and not copts.quiet:
+            # Always show the scope, so an operation on a workset is never
+            # mistaken for one on the whole client.
+            count = worksets.CountProjects(len(cmd.workset_members))
+            print(f"workset '{cmd.workset}': {count}", file=sys.stderr)
 
         if gopts.pager is not False and not isinstance(
             cmd, command.InteractiveCommand
@@ -541,6 +565,9 @@ class _Repo:
                 logger.error(
                     "error: manifest missing or unreadable -- please run init"
                 )
+            result = e.exit_code
+        except error.WorksetError as e:
+            logger.error("error: %s", e)
             result = e.exit_code
         except error.NoSuchProjectError as e:
             if e.name:

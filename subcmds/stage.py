@@ -33,6 +33,7 @@ class _ProjectList(color.Coloring):
 
 class Stage(command.InteractiveCommand):
     COMMON = True
+    WORKSET_SUPPORT = True
     helpSummary = "Stage file(s) for commit"
     helpUsage = """
 %prog -i [<project>...]

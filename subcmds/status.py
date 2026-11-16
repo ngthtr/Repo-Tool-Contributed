@@ -24,6 +24,7 @@ import platform_utils
 
 class Status(command.PagedCommand):
     COMMON = True
+    WORKSET_SUPPORT = True
     helpSummary = "Show the working tree status"
     helpUsage = """
 %prog [<project>...]
@@ -168,8 +169,12 @@ the following meanings:
         if opt.orphans:
             proj_dirs = set()
             proj_dirs_parents = set()
+            # All the projects, so that none of them is listed as an orphan.
             for project in self.GetProjects(
-                None, missing_ok=True, all_manifests=not opt.this_manifest_only
+                None,
+                missing_ok=True,
+                all_manifests=not opt.this_manifest_only,
+                workset=False,
             ):
                 relpath = project.RelPath(local=opt.this_manifest_only)
                 proj_dirs.add(relpath)

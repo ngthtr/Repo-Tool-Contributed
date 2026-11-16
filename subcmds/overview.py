@@ -20,6 +20,7 @@ import command
 
 class Overview(command.PagedCommand):
     COMMON = True
+    WORKSET_SUPPORT = True
     helpSummary = "Display overview of unmerged project branches"
     helpUsage = """
 %prog [--current-branch] [<project>...]

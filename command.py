@@ -22,11 +22,15 @@ from typing import List, Optional, TYPE_CHECKING
 import error
 import event_log
 import progress
+import repo_logging
 import worksets
 
 
 if TYPE_CHECKING:
     from project import Project
+
+
+logger = repo_logging.RepoLogger(__file__)
 
 
 # Are we generating man-pages?
@@ -79,6 +83,11 @@ class Command:
     # migrated subcommands can set it to False.
     MULTI_MANIFEST_SUPPORT = True
 
+    # Whether this command accepts the global -W option. GetProjects() then
+    # limits the projects to the workset: calls that need all the projects of
+    # the manifest must pass workset=False.
+    WORKSET_SUPPORT = False
+
     # Shared data across parallel execution workers.
     _parallel_context = None
 
@@ -102,6 +111,9 @@ class Command:
         self.manifest = manifest
         self.git_event_log = git_event_log
         self.outer_manifest = outer_manifest
+        # The workset selected with -W, if any, and its members.
+        self.workset = None
+        self.workset_members: Optional[List[worksets.Member]] = None
 
         # Cache for the OptionParser property.
         self._optparse = None
@@ -407,6 +419,7 @@ class Command:
         missing_ok=False,
         submodules_ok=None,
         all_manifests=False,
+        workset=True,
     ):
         """A list of projects that match the arguments.
 
@@ -425,6 +438,8 @@ class Command:
             all_manifests: a boolean, if True then all manifests and
                 submanifests are used. If False, then only the local
                 (sub)manifest is used.
+            workset: a boolean, whether to apply the workset selected with -W,
+                if any.
 
         Returns:
             A list of matching Project instances.
@@ -544,11 +559,58 @@ class Command:
 
                 result.extend(projects)
 
+        if workset and self.workset_members is not None:
+            result = self._FilterWorkset(result, explicit=bool(args))
+
         def _getpath(x):
             return x.relpath
 
         result.sort(key=_getpath)
         return result
+
+    def _FilterWorkset(
+        self, projects: List["Project"], explicit: bool
+    ) -> List["Project"]:
+        """Limit |projects| to the workset selected by the user.
+
+        Args:
+            projects: the candidate projects.
+            explicit: whether the projects were named on the command line. They
+                must then all be in the workset, rather than silently dropped.
+        """
+        members = {m.path for m in self.workset_members}
+        if explicit:
+            outside = [
+                p.RelPath(local=False)
+                for p in projects
+                if p.RelPath(local=False) not in members
+            ]
+            if outside:
+                raise error.WorksetError(
+                    f"not in workset '{self.workset}': {', '.join(outside)}"
+                )
+            return projects
+
+        selected = {p.RelPath(local=False) for p in projects}
+        # Derived subprojects are not in all_projects, only in |projects|.
+        known = {
+            p.RelPath(local=False): p
+            for p in self.manifest.outer_client.all_projects
+        }
+        for path in (m.path for m in self.workset_members):
+            if path in selected:
+                continue
+            project = known.get(path)
+            if project is None:
+                reason = "is not in the manifest"
+            elif not project.Exists:
+                reason = "is not checked out, skipping"
+            else:
+                reason = "is not in the selected manifests or groups, skipping"
+            logger.warning(
+                "warning: workset '%s': %s %s", self.workset, path, reason
+            )
+        return [p for p in projects if p.RelPath(local=False) in members]
 
     def FindProjects(
         self,
